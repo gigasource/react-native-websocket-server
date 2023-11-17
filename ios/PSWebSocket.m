@@ -92,8 +92,8 @@
     const struct sockaddr_in6 *addr = addrData.bytes;
     // Format it in readable (e.g. dotted-quad) form, with the port number:
     char nameBuf[INET6_ADDRSTRLEN];
-    if (inet_ntop(addr->sin6_TgTXExgxlRh4cVzwaKcnfamily, &addr->sin6_addr, nameBuf, (socklen_t)sizeof(nameBuf)) == NULL)
-        return nil;
+//    if (inet_ntop(addr->sin6_TgTXExgxlRh4cVzwaKcnfamily, &addr->sin6_addr, nameBuf, (socklen_t)sizeof(nameBuf)) == NULL)
+//        return nil;
     return [NSString stringWithFormat: @"%s:%hu", nameBuf, ntohs(addr->sin6_port)];
 }
 
@@ -143,7 +143,7 @@
         if(port == 0) {
             port = (_secure) ? 443 : 80;
         }
-        
+
         CFReadStreamRef readStream = nil;
         CFWriteStreamRef writeStream = nil;
         CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault,
@@ -152,7 +152,7 @@
                                            &readStream,
                                            &writeStream);
         NSAssert(readStream && writeStream, @"Failed to create streams for client socket");
-        
+
         _inputStream = CFBridgingRelease(readStream);
         _outputStream = CFBridgingRelease(writeStream);
     }
@@ -192,9 +192,9 @@
             [NSException raise:@"Invalid State" format:@"You cannot open a PSWebSocket more than once."];
             return;
         }
-        
+
         _opened = YES;
-        
+
         // connect
         [self connect];
     }];
@@ -228,25 +228,25 @@
         if(_readyState >= PSWebSocketReadyStateClosing) {
             return;
         }
-        
+
         BOOL connecting = (_readyState == PSWebSocketReadyStateConnecting);
         _readyState = PSWebSocketReadyStateClosing;
-        
+
         // send close code if we're not connecting
         if(!connecting) {
             _closeCode = code;
             [_driver sendCloseCode:code reason:reason];
         }
-        
+
         // disconnect gracefully
         [self disconnectGracefully];
-        
+
         // disconnect hard in 30 seconds
         __weak typeof(self)weakSelf = self;
         dispatch_after(dispatch_walltime(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             __strong typeof(weakSelf)strongSelf = weakSelf;
             if(!strongSelf) return;
-            
+
             [strongSelf executeWork:^{
                 if(strongSelf->_readyState >= PSWebSocketReadyStateClosed) {
                     return;
@@ -295,10 +295,10 @@
     // delegate
     _inputStream.delegate = self;
     _outputStream.delegate = self;
-    
+
     // driver
     [_driver start];
-    
+
     // schedule streams
     CFReadStreamSetDispatchQueue((__bridge CFReadStreamRef)_inputStream, _workQueue);
     CFWriteStreamSetDispatchQueue((__bridge CFWriteStreamRef)_outputStream, _workQueue);
@@ -310,11 +310,11 @@
     if(_outputStream.streamStatus == NSStreamStatusNotOpen) {
         [_outputStream open];
     }
-    
+
     // pump
     [self pumpInput];
     [self pumpOutput];
-    
+
     // prepare timeout
     if(_request.timeoutInterval > 0.0) {
         __weak typeof(self)weakSelf = self;
@@ -337,10 +337,10 @@
 - (void)disconnect {
     _inputStream.delegate = nil;
     _outputStream.delegate = nil;
-    
+
     [_inputStream close];
     [_outputStream close];
-    
+
     _inputStream = nil;
     _outputStream = nil;
 }
@@ -409,14 +409,14 @@
             _inputStream.streamStatus != NSStreamStatusClosed) &&
            !_sentClose) {
             _sentClose = YES;
-            
+
             [self disconnect];
-            
+
             if(!_failed) {
                 [self notifyDelegateDidCloseWithCode:_closeCode reason:_closeReason wasClean:YES];
             }
         }
-        
+
         [_outputBuffer compact];
 
         if(_readyState == PSWebSocketReadyStateOpen &&
