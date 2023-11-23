@@ -16,7 +16,10 @@
 @end
 
 
-@implementation RNWebsocketServer
+@implementation RNWebsocketServer {
+    NSMutableDictionary<NSNumber *, PSWebSocket *> *_clients;
+    int _counter;
+}
 
 - (dispatch_queue_t)methodQueue
 {
@@ -27,7 +30,7 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"onStart",  @"onStop", @"onOpen",  @"onClose", @"onMessage",  @"onError"];
+    return @[@"onStart",  @"onStop", @"connection",  @"onClose", @"message",  @"onError"];
 }
 
 RCT_EXPORT_METHOD(start: (NSString *) ipAddress
@@ -35,8 +38,16 @@ RCT_EXPORT_METHOD(start: (NSString *) ipAddress
 {
     self.server = [PSWebSocketServer serverWithHost:ipAddress port:port];
     self.server.delegate = self;
-    
+
     [self.server start];
+}
+
+RCT_EXPORT_METHOD(write: (nonnull NSNumber *) clientId payload: (NSString*) payload)
+{
+    if (!_clients || !_clients[clientId])
+        return;
+    PSWebSocket *webSocket = _clients[clientId];
+    [webSocket send:payload];
 }
 
 - (BOOL)server:(PSWebSocketServer *)server acceptWebSocketFrom:(NSData*)address withRequest:(NSURLRequest *)request trust:(SecTrustRef)trust response:(NSHTTPURLResponse **)response {
@@ -65,27 +76,35 @@ RCT_EXPORT_METHOD(start: (NSString *) ipAddress
 
 - (void)server:(PSWebSocketServer *)server webSocketDidOpen:(PSWebSocket *)webSocket {
     NSLog(@"Websocket serverDidOpen");
-    [self sendEventWithName:@"onOpen" body:nil];
+    if (!_clients) {
+        _clients = [NSMutableDictionary new];
+    }
+    NSNumber * clientId = @(_counter++);
+    if (!_clients[clientId]) {
+        _clients[clientId] = webSocket;
+        [webSocket setId:clientId];
+        [self sendEventWithName:@"connection" body:@{
+            @"id": clientId
+        }];
+    }
 
 }
 - (void)server:(PSWebSocketServer *)server webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
-
-
     NSMutableDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:[message dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil];
-    
-    [dictionary setObject:[NSString stringWithFormat:@"%@", [webSocket remoteHost]] forKey:@"origin"];
-    
-    [self sendEventWithName:@"onMessage" body:dictionary];
 
-    
+    [dictionary setObject:[NSString stringWithFormat:@"%@", webSocket.connId] forKey:@"id"];
+
+    [self sendEventWithName:@"message" body:dictionary];
+
+
     NSError *error;
     NSData *jsonObject = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:&error];
-    
+
     for (PSWebSocket *connection in [server getWebsocketConnections]) {
         NSLog(@"Websocket onmessage send: %@", [connection request]);
         [connection send:[[NSString alloc] initWithData:jsonObject encoding:NSUTF8StringEncoding]];
     }
-    
+
 }
 - (void)server:(PSWebSocketServer *)server webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
     [self sendEventWithName:@"onError" body:nil];

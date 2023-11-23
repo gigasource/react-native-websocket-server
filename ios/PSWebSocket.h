@@ -65,6 +65,7 @@ typedef NS_ENUM(NSInteger, PSWebSocketReadyState) {
 
 @property (nonatomic, strong, readonly) NSData* remoteAddress;
 @property (nonatomic, strong, readonly) NSString* remoteHost;
+@property (nonatomic, strong, readonly) NSNumber* connId;
 @property (nonatomic, strong) NSArray* SSLClientCertificates;
 
 @property (nonatomic, assign, getter=isInputPaused) BOOL inputPaused;
@@ -132,6 +133,8 @@ typedef NS_ENUM(NSInteger, PSWebSocketReadyState) {
  *  @param reason short textual reason why the connection was closed
  */
 - (void)closeWithCode:(NSInteger)code reason:(NSString *)reason;
+
+- (void)setId:(NSNumber *)connId;
 
 #pragma mark - Stream Properties
 

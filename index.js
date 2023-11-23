@@ -1,4 +1,4 @@
-import { NativeModules, NativeEventEmitter } from 'react-native';
+import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 import EventEmitter from 'eventemitter3';
 import Socket from "./Socket";
 const { RNWebsocketServer } = NativeModules;
@@ -42,8 +42,9 @@ export default class WebsocketServer extends EventEmitter {
         })
         this.nativeEventEmitter.addListener('message', (evt) => {
             const socket = this.socketMap[evt.id];
-            if (socket)
-                socket.emit('message', evt.payload);
+            if (socket) {
+                socket.emit('message', Platform.OS === 'ios' ? evt : JSON.parse(evt.payload));
+            }
         })
     }
 }
