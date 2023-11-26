@@ -21,7 +21,7 @@ import java.util.HashMap;
  */
 
 public class WebServer extends WebSocketServer {
-    private final DeviceEventManagerModule.RCTDeviceEventEmitter rctEvtEmitter;
+    private DeviceEventManagerModule.RCTDeviceEventEmitter rctEvtEmitter;
     private HashMap<WebSocket, Integer> connMap;
     private HashMap<Integer, WebSocket> clientIdsMap;
     private int clientSocketIds = 0;
@@ -128,6 +128,10 @@ public class WebServer extends WebSocketServer {
     public void write(int id, String payload) {
         WebSocket conn = clientIdsMap.get(id);
         conn.send(payload);
+    }
+
+    public void setNewContext(ReactApplicationContext reactContext) {
+        rctEvtEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
     }
 }
 
