@@ -73,6 +73,10 @@
     return PSPeerHostOfInputStream(_inputStream);
 }
 
+- (NSNumber* )connId {
+    return _connId;
+}
+
 @synthesize inputPaused = _inputPaused, outputPaused = _outputPaused;
 
 - (BOOL)isInputPaused {
