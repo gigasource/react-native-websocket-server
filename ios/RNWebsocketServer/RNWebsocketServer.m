@@ -111,6 +111,7 @@ RCT_EXPORT_METHOD(write: (nonnull NSNumber *) clientId payload: (NSString*) payl
 
 }
 - (void)server:(PSWebSocketServer *)server webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
+    NSMutableDictionary *dictionary = [NSDictionary dictionary];
     [dictionary setObject:[NSString stringWithFormat:@"%@", webSocket.connId] forKey:@"id"];
     [self sendEventWithName:@"disconnected" body:dictionary];
 }
