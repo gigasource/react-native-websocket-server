@@ -61,6 +61,9 @@ public class WebServer extends WebSocketServer {
             int clientId = connMap.get(conn);
             clientIdsMap.remove(clientId);
             connMap.remove(conn);
+            WritableMap eventParams = Arguments.createMap();
+            eventParams.putInt("id", clientId);
+            sendEvent("disconnected", eventParams);
 
             broadcast(jsonString);
         } catch (JSONException e) {

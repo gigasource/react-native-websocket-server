@@ -30,7 +30,7 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"onStart",  @"onStop", @"connection",  @"onClose", @"message",  @"onError"];
+    return @[@"onStart",  @"onStop", @"connection",  @"disconnected", @"message",  @"onError"];
 }
 
 RCT_EXPORT_METHOD(start: (NSString *) ipAddress
@@ -111,7 +111,7 @@ RCT_EXPORT_METHOD(write: (nonnull NSNumber *) clientId payload: (NSString*) payl
 
 }
 - (void)server:(PSWebSocketServer *)server webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
-    [self sendEventWithName:@"onClose" body:nil];
-
+    [dictionary setObject:[NSString stringWithFormat:@"%@", webSocket.connId] forKey:@"id"];
+    [self sendEventWithName:@"disconnected" body:dictionary];
 }
 @end

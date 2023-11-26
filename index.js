@@ -2,6 +2,7 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 import EventEmitter from 'eventemitter3';
 import Socket from "./Socket";
 const { RNWebsocketServer } = NativeModules;
+const nativeEventEmitter = new NativeEventEmitter(NativeModules.RNWebsocketServer);
 
 export default class WebsocketServer extends EventEmitter {
     constructor (ipAddress, port = 3770) {
@@ -9,7 +10,7 @@ export default class WebsocketServer extends EventEmitter {
         this.started = false;
         this.ipAddress = ipAddress;
         this.port = port;
-        this.nativeEventEmitter = new NativeEventEmitter(NativeModules.RNWebsocketServer);
+        this.nativeEventEmitter = nativeEventEmitter;
         this.socketMap = {};
         this._registerEvents();
     }
@@ -44,6 +45,13 @@ export default class WebsocketServer extends EventEmitter {
             const socket = this.socketMap[evt.id];
             if (socket) {
                 socket.emit('message', Platform.OS === 'ios' ? evt : JSON.parse(evt.payload));
+            }
+        })
+        this.nativeEventEmitter.addListener('disconnected', (evt) => {
+            const socket = this.socketMap[evt.id];
+            if (socket) {
+                socket.emit('disconnected');
+                delete this.socketMap[evt.id];
             }
         })
     }
