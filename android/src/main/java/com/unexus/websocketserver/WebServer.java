@@ -45,10 +45,7 @@ public class WebServer extends WebSocketServer {
             WritableMap eventParams = Arguments.createMap();
             eventParams.putInt("id", clientId);
             sendEvent("connection", eventParams);
-
-            broadcast(jsonString);
         } catch (JSONException e) {
-            broadcast(e.getMessage());
         }
     }
 
@@ -64,10 +61,7 @@ public class WebServer extends WebSocketServer {
             WritableMap eventParams = Arguments.createMap();
             eventParams.putInt("id", clientId);
             sendEvent("disconnected", eventParams);
-
-            broadcast(jsonString);
         } catch (JSONException e) {
-            broadcast(e.getMessage());
         }
     }
 
@@ -84,10 +78,7 @@ public class WebServer extends WebSocketServer {
             eventParams.putInt("id", clientId);
             eventParams.putString("payload", messageString);
             sendEvent("message", eventParams);
-
-            broadcast(jsonString);
         } catch (JSONException e) {
-            broadcast(e.getMessage());
         }
     }
 
@@ -97,10 +88,7 @@ public class WebServer extends WebSocketServer {
             String jsonString = (new JSONObject()).put("type", "onError")
                     .put("data", ex.getMessage())
                     .toString();
-
-            broadcast(jsonString);
         } catch (JSONException e) {
-            broadcast(e.getMessage());
         }
     }
 
@@ -110,10 +98,7 @@ public class WebServer extends WebSocketServer {
             String jsonString = (new JSONObject()).put("type", "onStart")
                     .put("data", "Websocket server now starting...")
                     .toString();
-
-            broadcast(jsonString);
         } catch (JSONException e) {
-            broadcast(e.getMessage());
         }
     }
 

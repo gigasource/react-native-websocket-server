@@ -95,16 +95,6 @@ RCT_EXPORT_METHOD(write: (nonnull NSNumber *) clientId payload: (NSString*) payl
     [dictionary setObject:[NSString stringWithFormat:@"%@", webSocket.connId] forKey:@"id"];
 
     [self sendEventWithName:@"message" body:dictionary];
-
-
-    NSError *error;
-    NSData *jsonObject = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:&error];
-
-    for (PSWebSocket *connection in [server getWebsocketConnections]) {
-        NSLog(@"Websocket onmessage send: %@", [connection request]);
-        [connection send:[[NSString alloc] initWithData:jsonObject encoding:NSUTF8StringEncoding]];
-    }
-
 }
 - (void)server:(PSWebSocketServer *)server webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
     [self sendEventWithName:@"onError" body:nil];
