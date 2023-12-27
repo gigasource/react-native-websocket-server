@@ -30,6 +30,7 @@ public class WebServer extends WebSocketServer {
         connMap = new HashMap<>();
         clientIdsMap = new HashMap<>();
         rctEvtEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+        setReuseAddr(true);
     }
 
     @Override
