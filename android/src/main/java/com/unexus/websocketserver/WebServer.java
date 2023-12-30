@@ -113,7 +113,9 @@ public class WebServer extends WebSocketServer {
 
     public void write(int id, String payload) {
         WebSocket conn = clientIdsMap.get(id);
-        conn.send(payload);
+        if (conn != null) {
+            conn.send(payload);
+        }
     }
 
     public void setNewContext(ReactApplicationContext reactContext) {
