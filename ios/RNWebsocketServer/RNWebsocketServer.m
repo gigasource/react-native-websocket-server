@@ -50,6 +50,11 @@ RCT_EXPORT_METHOD(write: (nonnull NSNumber *) clientId payload: (NSString*) payl
     [webSocket send:payload];
 }
 
+RCT_EXPORT_METHOD(stop)
+{
+    [self.server stop];
+}
+
 - (BOOL)server:(PSWebSocketServer *)server acceptWebSocketFrom:(NSData*)address withRequest:(NSURLRequest *)request trust:(SecTrustRef)trust response:(NSHTTPURLResponse **)response {
     NSLog(@"Websocket Request: %@", request);
 
@@ -70,8 +75,7 @@ RCT_EXPORT_METHOD(write: (nonnull NSNumber *) clientId payload: (NSString*) payl
 }
 - (void)serverDidStop:(PSWebSocketServer *)server {
     NSLog(@"Websocket serverDidStop");
-     [self sendEventWithName:@"onStop" body:nil];
-    [NSException raise:NSInternalInconsistencyException format:@"Server stopped unexpected."];
+    [self sendEventWithName:@"onStop" body:nil];
 }
 
 - (void)server:(PSWebSocketServer *)server webSocketDidOpen:(PSWebSocket *)webSocket {
