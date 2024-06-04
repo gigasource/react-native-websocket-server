@@ -28,6 +28,7 @@ export default class WebsocketServer extends EventEmitter {
      * Stops/closes websocket server
      */
     stop () {
+        this.started = false;
         RNWebsocketServer.stop();
     }
 
