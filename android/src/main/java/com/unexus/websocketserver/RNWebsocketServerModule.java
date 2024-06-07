@@ -49,6 +49,7 @@ public class RNWebsocketServerModule extends ReactContextBaseJavaModule {
             RNWebsocketServerModule.webServer.start();
         } else {
             RNWebsocketServerModule.webServer.setNewContext(mReactContext);
+            RNWebsocketServerModule.webServer.start();
         }
     }
 
