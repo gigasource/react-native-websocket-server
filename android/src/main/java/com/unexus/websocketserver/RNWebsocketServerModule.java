@@ -56,6 +56,7 @@ public class RNWebsocketServerModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void stop() throws IOException, InterruptedException {
         RNWebsocketServerModule.webServer.stop();
+        RNWebsocketServerModule.webServer = null;
     }
 
     @ReactMethod
