@@ -8,6 +8,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.json.JSONException;
@@ -112,9 +113,12 @@ public class WebServer extends WebSocketServer {
     }
 
     public void write(int id, String payload) {
-        WebSocket conn = clientIdsMap.get(id);
-        if (conn != null) {
-            conn.send(payload);
+        try {
+            WebSocket conn = clientIdsMap.get(id);
+            if (conn != null) {
+                conn.send(payload);
+            }
+        } catch (WebsocketNotConnectedException e) {
         }
     }
 

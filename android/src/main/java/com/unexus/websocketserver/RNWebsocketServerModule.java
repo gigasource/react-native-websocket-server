@@ -41,16 +41,14 @@ public class RNWebsocketServerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void start(String ipAddress, int port) throws IOException, InterruptedException {
-        if (RNWebsocketServerModule.webServer == null) {
-            InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
-
-            RNWebsocketServerModule.webServer = new WebServer(inetSocketAddress, mReactContext);
-
-            RNWebsocketServerModule.webServer.start();
-        } else {
-            RNWebsocketServerModule.webServer.setNewContext(mReactContext);
-            RNWebsocketServerModule.webServer.start();
+        if (RNWebsocketServerModule.webServer != null) {
+            this.stop();
         }
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
+
+        RNWebsocketServerModule.webServer = new WebServer(inetSocketAddress, mReactContext);
+
+        RNWebsocketServerModule.webServer.start();
     }
 
     @ReactMethod
