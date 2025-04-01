@@ -94,8 +94,8 @@ RCT_EXPORT_METHOD(stop)
 
 }
 - (void)server:(PSWebSocketServer *)server webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
-    NSMutableDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:[message dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil];
-
+    NSMutableDictionary *dictionary = [NSMutableDictionary new];
+    [dictionary setObject:message forKey:@"data"];
     [dictionary setObject:[NSString stringWithFormat:@"%@", webSocket.connId] forKey:@"id"];
 
     [self sendEventWithName:@"message" body:dictionary];
